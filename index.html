@@ -104,13 +104,13 @@
             <img src="logo.png" alt="Noise Junior" class="h-9 sm:h-11 w-auto object-contain block bg-transparent" />
         </div>
 
-        <!-- Navigation Tabs -->
+        <!-- Navigation Tabs (Explorer 2 First) -->
         <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1.5 rounded-full border border-slate-200">
-            <button id="tab-champ" onclick="switchTab('champ')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm">
-                <span>CHAMP 3</span>
-            </button>
-            <button id="tab-explorer" onclick="switchTab('explorer')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900">
+            <button id="tab-explorer" onclick="switchTab('explorer')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm">
                 <span>EXPLORER 2</span>
+            </button>
+            <button id="tab-champ" onclick="switchTab('champ')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900">
+                <span>CHAMP 3</span>
             </button>
         </nav>
     </header>
@@ -159,14 +159,14 @@
                             TODAY'S FACE
                         </span>
                         <span id="watch-series-tag" class="text-xs font-bold text-slate-400 font-fira uppercase tracking-wider">
-                            CHAMP 3 SERIES
+                            EXPLORER 2 SERIES
                         </span>
                     </div>
 
                     <div class="flex items-center space-x-4 my-2">
                         <div class="flex-1">
                             <div class="sticker-badge bg-emerald-400 text-slate-900 font-fira font-black text-lg sm:text-2xl px-4 py-2 rounded-xl uppercase tracking-wide border-2 border-slate-900 shadow-sm" id="face-name-badge">
-                                ACTIVE RUNNER
+                                WINDOW CAT AT NIGHT
                             </div>
                             <p class="text-xs text-slate-500 font-medium mt-3" id="face-description">
                                 Official custom watch face design.
@@ -283,24 +283,24 @@
     </div>
 
     <script>
-        // WATCH FACE DATA POOL (IMAGE BASED + FALLBACK DRAW PROCEDURES)
+        // WATCH FACE DATA POOL (EXPLORER 2 & CHAMP 3)
         const WATCH_FACES = {
-            champ: [
-                { id: 'c1', name: 'ACTIVE RUNNER', img: 'Frame 2147226976.png' },
-                { id: 'c2', name: 'ROPE CLIMBER', img: 'Frame 2147226978.png' },
-                { id: 'c3', name: 'HIGH FIVE HANDS', img: 'Packaging watchface.png' },
-                { id: 'c4', name: 'LEGO BRICKS GRID', img: 'Lego (1).png' }
-            ],
             explorer: [
                 { id: 'e1', name: 'WINDOW CAT AT NIGHT', img: 'Gemini_Generated_Image_1ppnm1ppnm1ppnm1.jpeg' },
                 { id: 'e2', name: 'SNEAKER STEP COUNTER', img: 'Gemini_Generated_Image_1ppnm1ppnm1ppnm1 (1).jpeg' },
                 { id: 'e3', name: 'LAZY CAPYBARA', img: 'Capybara.png' },
                 { id: 'e4', name: 'ACTIVE RUNNER', img: 'Frame 2147226976.png' }
+            ],
+            champ: [
+                { id: 'c1', name: 'ACTIVE RUNNER', img: 'Frame 2147226976.png' },
+                { id: 'c2', name: 'ROPE CLIMBER', img: 'Frame 2147226978.png' },
+                { id: 'c3', name: 'HIGH FIVE HANDS', img: 'Packaging watchface.png' },
+                { id: 'c4', name: 'LEGO BRICKS GRID', img: 'Lego (1).png' }
             ]
         };
 
-        // GAME STATE
-        let currentTab = 'champ';
+        // GAME STATE (DEFAULT TAB IS EXPLORER)
+        let currentTab = 'explorer';
         let currentFaceIndex = 0;
         let gridCols = 4;
         let gridRows = 3;
@@ -309,8 +309,8 @@
         let puzzlePieces = [];
         let boardState = [];
         let selectedPieceId = null;
-        let isHintVisible = false;
         let pieceEdges = [];
+        let hintTimeout = null;
 
         let fullImageCanvas = document.createElement('canvas');
         const CANVAS_SIZE = 600;
@@ -416,14 +416,14 @@
             const btnChamp = document.getElementById('tab-champ');
             const btnExplorer = document.getElementById('tab-explorer');
 
-            if (tabName === 'champ') {
-                btnChamp.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm";
-                btnExplorer.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900";
-                document.getElementById('watch-series-tag').innerText = 'CHAMP 3 SERIES';
-            } else {
+            if (tabName === 'explorer') {
                 btnExplorer.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm";
                 btnChamp.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900";
                 document.getElementById('watch-series-tag').innerText = 'EXPLORER 2 SERIES';
+            } else {
+                btnChamp.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm";
+                btnExplorer.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900";
+                document.getElementById('watch-series-tag').innerText = 'CHAMP 3 SERIES';
             }
 
             initGame();
@@ -453,7 +453,6 @@
                 finishInit();
             };
             img.onerror = () => {
-                // Background fallback
                 ctx.fillStyle = '#111827';
                 ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
                 ctx.fillStyle = '#FFFFFF';
@@ -545,7 +544,6 @@
 
                     pCtx.restore();
 
-                    // Subtle border outline on jigsaw cut
                     pCtx.save();
                     drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
                     pCtx.strokeStyle = 'rgba(0,0,0,0.25)';
@@ -645,7 +643,6 @@
             const slotEl = document.querySelector(`[data-slot-index="${slotIndex}"]`);
             const piece = puzzlePieces.find(p => p.id === pieceId);
 
-            // Render fitted piece image accurately scaled up so the jigsaw cuts overlap smoothly
             slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute -top-[25%] -left-[25%] w-[150%] h-[150%] max-w-none object-cover pointer-events-none">`;
             slotEl.classList.remove('puzzle-slot');
 
@@ -665,10 +662,20 @@
             }
         }
 
+        // HINT BUTTON AUTO-HIDE LOGIC (1 SECOND TIMEOUT)
         function toggleHint() {
             const hintCanvas = document.getElementById('hint-canvas');
-            isHintVisible = !isHintVisible;
-            hintCanvas.style.opacity = isHintVisible ? '0.35' : '0';
+            
+            if (hintTimeout) {
+                clearTimeout(hintTimeout);
+            }
+
+            hintCanvas.style.opacity = '0.35';
+
+            hintTimeout = setTimeout(() => {
+                hintCanvas.style.opacity = '0';
+                hintTimeout = null;
+            }, 1000);
         }
 
         function resetPuzzle() {
