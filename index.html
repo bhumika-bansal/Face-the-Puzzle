@@ -58,18 +58,6 @@
             transform: rotate(0deg) scale(1.04);
         }
 
-        .puzzle-slot {
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 1.5px dashed rgba(255, 255, 255, 0.5);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        .puzzle-slot.highlight {
-            background-color: rgba(255, 255, 255, 0.4);
-            border: 2px solid #ffffff;
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
-        }
-
         .piece-item {
             cursor: grab;
             user-select: none;
@@ -82,27 +70,21 @@
             z-index: 50;
         }
         .piece-item.selected {
-            filter: drop-shadow(0 0 8px #EF4444);
+            filter: drop-shadow(0 0 10px #EF4444);
             transform: scale(1.05);
             z-index: 40;
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
         }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col justify-between relative selection:bg-yellow-200">
 
     <header class="w-full bg-white border-b border-yellow-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between relative z-20 shadow-sm">
+        <!-- Top Left Clean Logo -->
         <div class="flex items-center top-left-header">
             <img src="logo.png" alt="Noise Junior" class="h-9 sm:h-11 w-auto object-contain block bg-transparent" />
         </div>
 
+        <!-- Navigation Tabs (Explorer 2 First) -->
         <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1.5 rounded-full border border-slate-200">
             <button id="tab-explorer" onclick="switchTab('explorer')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm">
                 <span>EXPLORER 2</span>
@@ -114,122 +96,99 @@
     </header>
 
     <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-grow relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <!-- LEFT PANEL -->
-            <div class="lg:col-span-4 flex flex-col justify-between space-y-8">
+            <!-- LEFT PANEL: Pile of Pieces & Controls -->
+            <div class="lg:col-span-5 flex flex-col justify-between space-y-6">
                 
                 <div>
-                    <h1 class="font-fira font-black text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-none tracking-tight">
+                    <h1 class="font-fira font-black text-4xl sm:text-5xl text-slate-900 leading-none tracking-tight">
                         Face the<br/>
                         Puz<span class="text-amber-400 inline-block transform hover:rotate-45 transition-transform cursor-pointer">✱</span>le
                     </h1>
-                    <p class="text-slate-600 mt-3 text-sm sm:text-base font-medium">
-                        You've seen the watch faces.<br/>
-                        Now let's test if you remember them.👀
+                    <p class="text-slate-600 mt-2 text-sm font-medium">
+                        Match the cut shapes to complete the watch face!
                     </p>
                 </div>
 
-                <div class="space-y-4">
-                    <h3 class="font-fira font-extrabold text-xs uppercase tracking-widest text-slate-400">HOW TO PLAY</h3>
-                    
-                    <div class="space-y-3 font-medium text-xs sm:text-sm text-slate-700">
-                        <div class="flex items-start space-x-3">
-                            <span class="bg-amber-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">01</span>
-                            <span>Pick a piece from the panel below. Find its happy little home on the green board.</span>
-                        </div>
-                        <div class="flex items-start space-x-3">
-                            <span class="bg-pink-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">02</span>
-                            <span>Feeling stuck? Peek at the watch face with a quick hint!</span>
-                        </div>
-                        <div class="flex items-start space-x-3">
-                            <span class="bg-emerald-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">03</span>
-                            <span>Piece by piece, bring the whole face to life. 💛</span>
+                <!-- TODAY'S FACE BADGE -->
+                <div class="bg-white rounded-2xl p-4 border-2 border-amber-200/60 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span id="watch-series-tag" class="text-[10px] font-extrabold text-slate-400 font-fira uppercase tracking-widest block mb-1">
+                            EXPLORER 2 SERIES
+                        </span>
+                        <div class="sticker-badge bg-emerald-400 text-slate-900 font-fira font-black text-base px-3 py-1 rounded-lg uppercase tracking-wide border-2 border-slate-900 shadow-sm" id="face-name-badge">
+                            CAT AT NIGHT
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-amber-200/60 shadow-xl shadow-amber-900/5 relative overflow-hidden group">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="bg-amber-100 text-amber-900 font-fira font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
-                            TODAY'S FACE
-                        </span>
-                        <span id="watch-series-tag" class="text-xs font-bold text-slate-400 font-fira uppercase tracking-wider">
-                            EXPLORER 2 SERIES
-                        </span>
+                <!-- PILE OF PIECES DISPLAY AREA -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-amber-200/80 shadow-lg text-center flex flex-col items-center justify-center space-y-4 min-h-[260px] relative">
+                    <span class="font-fira font-extrabold text-xs uppercase tracking-widest text-slate-400">ACTIVE PIECE STACK</span>
+                    
+                    <!-- Stack Holder -->
+                    <div id="piece-stack-card" class="relative w-36 h-36 flex items-center justify-center">
+                        <!-- Current piece rendered via JS -->
                     </div>
 
-                    <div class="flex items-center space-x-4 my-2">
-                        <div class="flex-1">
-                            <div class="sticker-badge bg-emerald-400 text-slate-900 font-fira font-black text-lg sm:text-2xl px-4 py-2 rounded-xl uppercase tracking-wide border-2 border-slate-900 shadow-sm" id="face-name-badge">
-                                CAT AT NIGHT
-                            </div>
-                            <p class="text-xs text-slate-500 font-medium mt-3" id="face-description">
-                                Official watch face design.
-                            </p>
-                        </div>
-                    </div>
+                    <button onclick="shuffleStack()" class="px-6 py-2.5 rounded-xl font-fira font-black text-sm bg-slate-900 text-white shadow-md hover:bg-slate-800 transition-all flex items-center space-x-2">
+                        <span>🔀 RANDOMIZE / NEXT PIECE</span>
+                    </button>
                 </div>
 
             </div>
 
-            <!-- RIGHT PANEL -->
-            <div class="lg:col-span-8 space-y-6">
+            <!-- RIGHT PANEL: Board Canvas with Outlined Jigsaw Cuts -->
+            <div class="lg:col-span-7 space-y-6">
                 
-                <div class="bg-white rounded-3xl p-4 sm:p-6 border-2 border-amber-200/80 shadow-xl shadow-amber-900/5">
+                <div class="bg-white rounded-3xl p-4 sm:p-6 border-2 border-amber-200/80 shadow-xl">
                     
+                    <!-- Board Header Controls -->
                     <div class="flex items-center justify-between mb-4 px-2">
-                        <span class="font-fira font-black text-xs sm:text-sm uppercase tracking-widest text-slate-500">YOUR PUZZLE BOARD</span>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold font-fira text-slate-400">PIECES:</span>
-                            <span id="piece-count-label" class="font-fira font-black text-sm text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">12</span>
+                            <span class="font-fira font-black text-xs sm:text-sm uppercase tracking-widest text-slate-500">PUZZLE BOARD</span>
+                        </div>
+
+                        <!-- Pieces & Actions -->
+                        <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200 mr-2">
+                                <button onclick="changePieceCount(-1)" class="w-7 h-7 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center">-</button>
+                                <span id="grid-size-text" class="font-fira font-bold text-xs px-2 text-slate-800">12 pcs</span>
+                                <button onclick="changePieceCount(1)" class="w-7 h-7 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center">+</button>
+                            </div>
+
+                            <button onclick="toggleHint()" class="px-3 py-1.5 rounded-xl font-fira font-extrabold text-xs bg-emerald-500 text-white hover:bg-emerald-600 transition-all">
+                                💡 HINT
+                            </button>
+                            <button onclick="reCutPuzzle()" class="px-3 py-1.5 rounded-xl font-fira font-extrabold text-xs bg-pink-500 text-white hover:bg-pink-600 transition-all">
+                                ✂ NEW CUT
+                            </button>
+                            <button onclick="resetPuzzle()" class="px-3 py-1.5 rounded-xl font-fira font-extrabold text-xs bg-amber-400 text-slate-900 hover:bg-amber-500 transition-all">
+                                ↺ RESET
+                            </button>
                         </div>
                     </div>
 
+                    <!-- Main Puzzle Board Container -->
                     <div class="relative w-full aspect-square max-w-[500px] mx-auto bg-brandBoardGreen rounded-3xl p-3 sm:p-4 shadow-inner border-4 border-emerald-600/30 overflow-hidden" id="puzzle-container">
                         
+                        <!-- Hint Canvas Overlay -->
                         <canvas id="hint-canvas" class="absolute inset-0 w-full h-full p-3 sm:p-4 opacity-0 transition-opacity duration-300 pointer-events-none rounded-3xl z-0"></canvas>
 
-                        <div id="puzzle-grid" class="w-full h-full grid relative z-10">
+                        <!-- Jigsaw Outlines Canvas (Shows full jigsaw cut lines on board) -->
+                        <canvas id="outlines-canvas" class="absolute inset-0 w-full h-full p-3 sm:p-4 pointer-events-none rounded-3xl z-10"></canvas>
+
+                        <!-- Interactive Grid Slots Container -->
+                        <div id="puzzle-grid" class="w-full h-full grid relative z-20">
                             <!-- Slots created via JS -->
                         </div>
                     </div>
 
-                    <div class="mt-6 pt-5 border-t border-slate-100">
-                        <div class="flex items-center justify-between mb-3 px-1">
-                            <span class="font-fira font-black text-xs uppercase tracking-widest text-slate-400">LOOSE PIECES</span>
-                            <span class="text-xs text-slate-400 font-medium hidden sm:inline-block">Tap piece, then tap matching grid spot or drag directly</span>
-                        </div>
-
-                        <div id="loose-pieces-container" class="min-h-[120px] bg-slate-50 rounded-2xl p-3 border-2 border-dashed border-slate-200 flex items-center space-x-4 overflow-x-auto no-scrollbar">
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2">
-                        
-                        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button onclick="changePieceCount(-1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">-</button>
-                            <span id="grid-size-text" class="font-fira font-bold text-xs sm:text-sm px-2 text-slate-800">12 pcs</span>
-                            <button onclick="changePieceCount(1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">+</button>
-                        </div>
-
-                        <div class="flex items-center flex-wrap gap-2">
-                            <button onclick="toggleHint()" id="btn-hint" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition-all flex items-center space-x-1.5">
-                                <span>💡 HINT</span>
-                            </button>
-                            
-                            <button onclick="reCutPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-pink-500 text-white shadow-sm hover:bg-pink-600 transition-all flex items-center space-x-1.5">
-                                <span>✂ NEW CUT</span>
-                            </button>
-
-                            <button onclick="resetPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-amber-400 text-slate-900 shadow-sm hover:bg-amber-500 transition-all flex items-center space-x-1.5">
-                                <span>↺ RESET</span>
-                            </button>
-
-                            <button onclick="tryAnotherFace()" class="px-4 py-2 rounded-xl font-fira font-black text-xs sm:text-sm bg-slate-900 text-white shadow-md hover:bg-slate-800 transition-all flex items-center space-x-1.5">
-                                <span>🔄 TRY ANOTHER</span>
-                            </button>
-                        </div>
+                    <div class="mt-4 text-center">
+                        <button onclick="tryAnotherFace()" class="px-5 py-2.5 rounded-2xl font-fira font-black text-sm bg-slate-900 text-white shadow-md hover:bg-slate-800 transition-all">
+                            🔄 TRY ANOTHER WATCH FACE
+                        </button>
                     </div>
 
                 </div>
@@ -239,6 +198,7 @@
         </div>
     </main>
 
+    <!-- Win Modal -->
     <div id="win-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center border-4 border-amber-300 shadow-2xl transform scale-95 transition-transform duration-300 relative overflow-hidden" id="win-modal-card">
             
@@ -256,7 +216,7 @@
             </h2>
 
             <p class="text-slate-600 text-sm font-medium mb-6">
-                Awesome memory! You brought the entire watch face to life flawlessly.
+                Awesome job! You matched all the jigsaw cuts perfectly.
             </p>
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -288,13 +248,14 @@
 
         let currentTab = 'explorer';
         let currentFaceIndex = 0;
-        let gridCols = 3;
-        let gridRows = 2;
-        let activePieceCount = 6;
+        let gridCols = 4;
+        let gridRows = 3;
+        let activePieceCount = 12;
         
         let puzzlePieces = [];
+        let unplacedPieces = [];
+        let activeStackIndex = 0;
         let boardState = [];
-        let selectedPieceId = null;
         let pieceEdges = [];
         let hintTimeout = null;
 
@@ -303,6 +264,7 @@
         fullImageCanvas.width = CANVAS_SIZE;
         fullImageCanvas.height = CANVAS_SIZE;
 
+        // Path generator for jigsaw tab cuts
         function drawJigsawPath(ctx, width, height, top, right, bottom, left) {
             ctx.beginPath();
             ctx.moveTo(0, 0);
@@ -419,6 +381,7 @@
 
             generateEdgeMap();
             createPuzzlePieces();
+            drawBoardJigsawOutlines();
         }
 
         function generateEdgeMap() {
@@ -432,6 +395,32 @@
                         bottom: r === gridRows - 1 ? 0 : (Math.random() < 0.5 ? 1 : -1),
                         left: c === 0 ? 0 : -pieceEdges[r][c-1].right
                     };
+                }
+            }
+        }
+
+        function drawBoardJigsawOutlines() {
+            const canvas = document.getElementById('outlines-canvas');
+            canvas.width = CANVAS_SIZE;
+            canvas.height = CANVAS_SIZE;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+            const tileW = CANVAS_SIZE / gridCols;
+            const tileH = CANVAS_SIZE / gridRows;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.setLineDash([6, 6]);
+            ctx.lineWidth = 2.5;
+
+            for (let r = 0; r < gridRows; r++) {
+                for (let c = 0; c < gridCols; c++) {
+                    const edges = pieceEdges[r][c];
+                    ctx.save();
+                    ctx.translate(c * tileW, r * tileH);
+                    drawJigsawPath(ctx, tileW, tileH, edges.top, edges.right, edges.bottom, edges.left);
+                    ctx.stroke();
+                    ctx.restore();
                 }
             }
         }
@@ -452,7 +441,6 @@
             gridCols = cols;
             gridRows = rows;
             activePieceCount = count;
-            document.getElementById('piece-count-label').innerText = count;
             document.getElementById('grid-size-text').innerText = `${count} pcs`;
             initGame();
         }
@@ -460,7 +448,6 @@
         function createPuzzlePieces() {
             puzzlePieces = [];
             boardState = new Array(gridCols * gridRows).fill(null);
-            selectedPieceId = null;
 
             const tileWidth = CANVAS_SIZE / gridCols;
             const tileHeight = CANVAS_SIZE / gridRows;
@@ -494,7 +481,7 @@
 
                     pCtx.restore();
 
-                    // Subtle black border line over jigsaw tab cut edges
+                    // Edge outline on piece
                     pCtx.save();
                     pCtx.translate(padX, padY);
                     drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
@@ -505,22 +492,18 @@
 
                     puzzlePieces.push({
                         id: index,
-                        correctSlot: index,
                         row: r,
                         col: c,
-                        canvas: pCanvas,
-                        dataUrl: pCanvas.toDataURL(),
-                        edges: edges,
-                        padX: padX,
-                        padY: padY
+                        dataUrl: pCanvas.toDataURL()
                     });
                 }
             }
 
-            let loosePieces = [...puzzlePieces].sort(() => Math.random() - 0.5);
+            unplacedPieces = [...puzzlePieces].sort(() => Math.random() - 0.5);
+            activeStackIndex = 0;
 
             renderGridSlots();
-            renderLoosePieces(loosePieces);
+            renderActiveStackPiece();
         }
 
         function renderGridSlots() {
@@ -531,7 +514,7 @@
 
             for (let i = 0; i < gridCols * gridRows; i++) {
                 const slot = document.createElement('div');
-                slot.className = 'puzzle-slot rounded-2xl relative flex items-center justify-center cursor-pointer';
+                slot.className = 'puzzle-slot rounded-2xl relative flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors';
                 slot.dataset.slotIndex = i;
 
                 slot.addEventListener('click', () => handleSlotClick(i));
@@ -542,44 +525,44 @@
             }
         }
 
-        function renderLoosePieces(pieces) {
-            const container = document.getElementById('loose-pieces-container');
-            container.innerHTML = '';
+        function renderActiveStackPiece() {
+            const card = document.getElementById('piece-stack-card');
+            card.innerHTML = '';
 
-            if (pieces.length === 0) {
-                container.innerHTML = `<span class="text-xs text-slate-400 font-fira font-bold uppercase mx-auto">All pieces placed on board!</span>`;
+            if (unplacedPieces.length === 0) {
+                card.innerHTML = `<span class="font-fira font-black text-emerald-600 text-sm uppercase">All pieces placed! 🎉</span>`;
                 return;
             }
 
-            pieces.forEach(p => {
-                const img = document.createElement('img');
-                img.src = p.dataUrl;
-                img.className = 'piece-item w-20 h-20 sm:w-24 sm:h-24 object-contain flex-shrink-0 cursor-grab active:cursor-grabbing';
-                img.dataset.pieceId = p.id;
-                img.draggable = true;
+            if (activeStackIndex >= unplacedPieces.length) {
+                activeStackIndex = 0;
+            }
 
-                img.addEventListener('click', () => selectPiece(p.id, img));
-                img.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', p.id);
-                });
+            const currentPiece = unplacedPieces[activeStackIndex];
 
-                container.appendChild(img);
+            const img = document.createElement('img');
+            img.src = currentPiece.dataUrl;
+            img.className = 'piece-item w-full h-full object-contain cursor-grab active:cursor-grabbing selected';
+            img.draggable = true;
+            img.dataset.pieceId = currentPiece.id;
+
+            img.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', currentPiece.id);
             });
+
+            card.appendChild(img);
         }
 
-        function selectPiece(id, imgEl) {
-            document.querySelectorAll('.piece-item').forEach(el => el.classList.remove('selected'));
-            if (selectedPieceId === id) {
-                selectedPieceId = null;
-            } else {
-                selectedPieceId = id;
-                imgEl.classList.add('selected');
-            }
+        function shuffleStack() {
+            if (unplacedPieces.length <= 1) return;
+            activeStackIndex = (activeStackIndex + 1) % unplacedPieces.length;
+            renderActiveStackPiece();
         }
 
         function handleSlotClick(slotIndex) {
-            if (selectedPieceId === null) return;
-            placePiece(selectedPieceId, slotIndex);
+            if (unplacedPieces.length === 0) return;
+            const currentPiece = unplacedPieces[activeStackIndex];
+            placePiece(currentPiece.id, slotIndex);
         }
 
         function handleDrop(e, slotIndex) {
@@ -593,18 +576,25 @@
         function placePiece(pieceId, slotIndex) {
             if (boardState[slotIndex] !== null) return;
 
+            // Strict placement check
+            if (pieceId !== slotIndex) {
+                return; // Only correct jigsaw spot accepts piece
+            }
+
             boardState[slotIndex] = pieceId;
 
             const slotEl = document.querySelector(`[data-slot-index="${slotIndex}"]`);
             const piece = puzzlePieces.find(p => p.id === pieceId);
 
             slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute pointer-events-none max-w-none" style="width: 160%; height: 160%; top: -30%; left: -30%;">`;
-            slotEl.classList.remove('puzzle-slot');
 
-            const remainingLoose = puzzlePieces.filter(p => !boardState.includes(p.id));
-            renderLoosePieces(remainingLoose);
-            selectedPieceId = null;
+            // Remove from unplaced stack
+            unplacedPieces = unplacedPieces.filter(p => p.id !== pieceId);
+            if (activeStackIndex >= unplacedPieces.length) {
+                activeStackIndex = 0;
+            }
 
+            renderActiveStackPiece();
             checkWinState();
         }
 
@@ -619,13 +609,9 @@
 
         function toggleHint() {
             const hintCanvas = document.getElementById('hint-canvas');
-            
-            if (hintTimeout) {
-                clearTimeout(hintTimeout);
-            }
+            if (hintTimeout) clearTimeout(hintTimeout);
 
             hintCanvas.style.opacity = '0.35';
-
             hintTimeout = setTimeout(() => {
                 hintCanvas.style.opacity = '0';
                 hintTimeout = null;
@@ -634,9 +620,10 @@
 
         function resetPuzzle() {
             boardState = new Array(gridCols * gridRows).fill(null);
+            unplacedPieces = [...puzzlePieces].sort(() => Math.random() - 0.5);
+            activeStackIndex = 0;
             renderGridSlots();
-            renderLoosePieces([...puzzlePieces].sort(() => Math.random() - 0.5));
-            selectedPieceId = null;
+            renderActiveStackPiece();
         }
 
         function reCutPuzzle() {
