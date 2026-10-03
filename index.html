@@ -41,7 +41,6 @@
             font-family: 'Fira Sans Condensed', sans-serif;
         }
 
-        /* Top Left Header Logo clean transparent override */
         .top-left-header, 
         .header-logo {
             background: none !important;
@@ -63,6 +62,7 @@
             background-color: rgba(255, 255, 255, 0.15);
             border: 1.5px dashed rgba(255, 255, 255, 0.5);
             transition: all 0.2s ease;
+            position: relative;
         }
         .puzzle-slot.highlight {
             background-color: rgba(255, 255, 255, 0.4);
@@ -99,12 +99,10 @@
 <body class="min-h-screen text-slate-800 flex flex-col justify-between relative selection:bg-yellow-200">
 
     <header class="w-full bg-white border-b border-yellow-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between relative z-20 shadow-sm">
-        <!-- Top Left Clean PNG Logo -->
         <div class="flex items-center top-left-header">
             <img src="logo.png" alt="Noise Junior" class="h-9 sm:h-11 w-auto object-contain block bg-transparent" />
         </div>
 
-        <!-- Navigation Tabs (Explorer 2 First) -->
         <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1.5 rounded-full border border-slate-200">
             <button id="tab-explorer" onclick="switchTab('explorer')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm">
                 <span>EXPLORER 2</span>
@@ -118,7 +116,7 @@
     <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-grow relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- LEFT PANEL: Instructions & Today's Face Card -->
+            <!-- LEFT PANEL -->
             <div class="lg:col-span-4 flex flex-col justify-between space-y-8">
                 
                 <div>
@@ -132,7 +130,6 @@
                     </p>
                 </div>
 
-                <!-- How To Play Steps -->
                 <div class="space-y-4">
                     <h3 class="font-fira font-extrabold text-xs uppercase tracking-widest text-slate-400">HOW TO PLAY</h3>
                     
@@ -152,7 +149,6 @@
                     </div>
                 </div>
 
-                <!-- Today's Face Card -->
                 <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-amber-200/60 shadow-xl shadow-amber-900/5 relative overflow-hidden group">
                     <div class="flex items-center justify-between mb-3">
                         <span class="bg-amber-100 text-amber-900 font-fira font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
@@ -166,7 +162,7 @@
                     <div class="flex items-center space-x-4 my-2">
                         <div class="flex-1">
                             <div class="sticker-badge bg-emerald-400 text-slate-900 font-fira font-black text-lg sm:text-2xl px-4 py-2 rounded-xl uppercase tracking-wide border-2 border-slate-900 shadow-sm" id="face-name-badge">
-                                WINDOW CAT AT NIGHT
+                                CAT AT NIGHT
                             </div>
                             <p class="text-xs text-slate-500 font-medium mt-3" id="face-description">
                                 Official watch face design.
@@ -177,12 +173,11 @@
 
             </div>
 
-            <!-- RIGHT PANEL: Puzzle Grid & Controls -->
+            <!-- RIGHT PANEL -->
             <div class="lg:col-span-8 space-y-6">
                 
                 <div class="bg-white rounded-3xl p-4 sm:p-6 border-2 border-amber-200/80 shadow-xl shadow-amber-900/5">
                     
-                    <!-- Board Top Header -->
                     <div class="flex items-center justify-between mb-4 px-2">
                         <span class="font-fira font-black text-xs sm:text-sm uppercase tracking-widest text-slate-500">YOUR PUZZLE BOARD</span>
                         <div class="flex items-center space-x-2">
@@ -193,38 +188,31 @@
 
                     <div class="relative w-full aspect-square max-w-[500px] mx-auto bg-brandBoardGreen rounded-3xl p-3 sm:p-4 shadow-inner border-4 border-emerald-600/30 overflow-hidden" id="puzzle-container">
                         
-                        <!-- Ghost Canvas for Hint -->
-                        <canvas id="hint-canvas" class="absolute inset-0 w-full h-full p-3 sm:p-4 opacity-0 transition-opacity duration-300 pointer-events-none rounded-3xl"></canvas>
+                        <canvas id="hint-canvas" class="absolute inset-0 w-full h-full p-3 sm:p-4 opacity-0 transition-opacity duration-300 pointer-events-none rounded-3xl z-0"></canvas>
 
-                        <!-- Interactive Grid Container -->
-                        <div id="puzzle-grid" class="w-full h-full grid gap-1 relative z-10">
+                        <div id="puzzle-grid" class="w-full h-full grid relative z-10">
                             <!-- Slots created via JS -->
                         </div>
                     </div>
 
-                    <!-- Loose Pieces Panel Section -->
                     <div class="mt-6 pt-5 border-t border-slate-100">
                         <div class="flex items-center justify-between mb-3 px-1">
                             <span class="font-fira font-black text-xs uppercase tracking-widest text-slate-400">LOOSE PIECES</span>
                             <span class="text-xs text-slate-400 font-medium hidden sm:inline-block">Tap piece, then tap matching grid spot or drag directly</span>
                         </div>
 
-                        <!-- Scrollable Pieces Box -->
                         <div id="loose-pieces-container" class="min-h-[120px] bg-slate-50 rounded-2xl p-3 border-2 border-dashed border-slate-200 flex items-center space-x-4 overflow-x-auto no-scrollbar">
-                            <!-- Loose pieces populated via JS -->
                         </div>
                     </div>
 
                     <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2">
                         
-                        <!-- Piece Count Selector -->
                         <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                             <button onclick="changePieceCount(-1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">-</button>
                             <span id="grid-size-text" class="font-fira font-bold text-xs sm:text-sm px-2 text-slate-800">12 pcs</span>
                             <button onclick="changePieceCount(1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">+</button>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="flex items-center flex-wrap gap-2">
                             <button onclick="toggleHint()" id="btn-hint" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition-all flex items-center space-x-1.5">
                                 <span>💡 HINT</span>
@@ -283,7 +271,6 @@
     </div>
 
     <script>
-        // WATCH FACE DATA POOL (EXPLORER 2 & CHAMP 3)
         const WATCH_FACES = {
             explorer: [
                 { id: 'e1', name: 'CAT AT NIGHT', img: 'Gemini_Generated_Image_1ppnm1ppnm1ppnm1.jpeg' },
@@ -299,12 +286,11 @@
             ]
         };
 
-        // GAME STATE (DEFAULT TAB IS EXPLORER)
         let currentTab = 'explorer';
         let currentFaceIndex = 0;
-        let gridCols = 4;
-        let gridRows = 3;
-        let activePieceCount = 12;
+        let gridCols = 3;
+        let gridRows = 2;
+        let activePieceCount = 6;
         
         let puzzlePieces = [];
         let boardState = [];
@@ -317,88 +303,48 @@
         fullImageCanvas.width = CANVAS_SIZE;
         fullImageCanvas.height = CANVAS_SIZE;
 
-        // JIGSAW INTERLOCKING CUT PATH GENERATOR
         function drawJigsawPath(ctx, width, height, top, right, bottom, left) {
-            const padX = width * 0.25;
-            const padY = height * 0.25;
-            
             ctx.beginPath();
-            ctx.moveTo(padX, padY);
+            ctx.moveTo(0, 0);
 
             // TOP EDGE
             if (top === 0) {
-                ctx.lineTo(padX + width, padY);
+                ctx.lineTo(width, 0);
             } else {
-                const dir = top;
-                ctx.lineTo(padX + width * 0.35, padY);
-                ctx.bezierCurveTo(
-                    padX + width * 0.35, padY - dir * height * 0.18,
-                    padX + width * 0.45, padY - dir * height * 0.22,
-                    padX + width * 0.5, padY - dir * height * 0.22
-                );
-                ctx.bezierCurveTo(
-                    padX + width * 0.55, padY - dir * height * 0.22,
-                    padX + width * 0.65, padY - dir * height * 0.18,
-                    padX + width * 0.65, padY
-                );
-                ctx.lineTo(padX + width, padY);
+                ctx.lineTo(width * 0.35, 0);
+                ctx.bezierCurveTo(width * 0.35, -top * height * 0.18, width * 0.42, -top * height * 0.22, width * 0.5, -top * height * 0.22);
+                ctx.bezierCurveTo(width * 0.58, -top * height * 0.22, width * 0.65, -top * height * 0.18, width * 0.65, 0);
+                ctx.lineTo(width, 0);
             }
 
             // RIGHT EDGE
             if (right === 0) {
-                ctx.lineTo(padX + width, padY + height);
+                ctx.lineTo(width, height);
             } else {
-                const dir = right;
-                ctx.lineTo(padX + width, padY + height * 0.35);
-                ctx.bezierCurveTo(
-                    padX + width + dir * width * 0.18, padY + height * 0.35,
-                    padX + width + dir * width * 0.22, padY + height * 0.45,
-                    padX + width + dir * width * 0.22, padY + height * 0.5
-                );
-                ctx.bezierCurveTo(
-                    padX + width + dir * width * 0.22, padY + height * 0.55,
-                    padX + width + dir * width * 0.18, padY + height * 0.65,
-                    padX + width, padY + height * 0.65
-                );
-                ctx.lineTo(padX + width, padY + height);
+                ctx.lineTo(width, height * 0.35);
+                ctx.bezierCurveTo(width + right * width * 0.18, height * 0.35, width + right * width * 0.22, height * 0.42, width + right * width * 0.22, height * 0.5);
+                ctx.bezierCurveTo(width + right * width * 0.22, height * 0.58, width + right * width * 0.18, height * 0.65, width, height * 0.65);
+                ctx.lineTo(width, height);
             }
 
             // BOTTOM EDGE
             if (bottom === 0) {
-                ctx.lineTo(padX, padY + height);
+                ctx.lineTo(0, height);
             } else {
-                const dir = bottom;
-                ctx.lineTo(padX + width * 0.65, padY + height);
-                ctx.bezierCurveTo(
-                    padX + width * 0.65, padY + height + dir * height * 0.18,
-                    padX + width * 0.55, padY + height + dir * height * 0.22,
-                    padX + width * 0.5, padY + height + dir * height * 0.22
-                );
-                ctx.bezierCurveTo(
-                    padX + width * 0.45, padY + height + dir * height * 0.22,
-                    padX + width * 0.35, padY + height + dir * height * 0.18,
-                    padX + width * 0.35, padY + height
-                );
-                ctx.lineTo(padX, padY + height);
+                ctx.lineTo(width * 0.65, height);
+                ctx.bezierCurveTo(width * 0.65, height + bottom * height * 0.18, width * 0.58, height + bottom * height * 0.22, width * 0.5, height + bottom * height * 0.22);
+                ctx.bezierCurveTo(width * 0.42, height + bottom * height * 0.22, width * 0.35, height + bottom * height * 0.18, width * 0.35, height);
+                ctx.lineTo(0, height);
             }
 
             // LEFT EDGE
             if (left === 0) {
-                ctx.lineTo(padX, padY);
+                ctx.lineTo(0, 0);
             } else {
-                const dir = left;
-                ctx.lineTo(padX, padY + height * 0.65);
-                ctx.bezierCurveTo(
-                    padX - dir * width * 0.18, padY + height * 0.65,
-                    padX - dir * width * 0.22, padY + height * 0.55,
-                    padX - dir * width * 0.22, padY + height * 0.5
-                );
-                ctx.bezierCurveTo(
-                    padX - dir * width * 0.22, padY + height * 0.45,
-                    padX - dir * width * 0.18, padY + height * 0.35,
-                    padX, padY + height * 0.35
-                );
-                ctx.lineTo(padX, padY);
+                ctx.lineTo(0, height * 0.65);
+                ctx.bezierCurveTo(-left * width * 0.18, height * 0.65, -left * width * 0.22, height * 0.58, -left * width * 0.22, height * 0.5);
+                ctx.bezierCurveTo(-left * width * 0.22, height * 0.42, -left * width * 0.18, height * 0.35, 0, height * 0.35);
+                ctx.lineTo(0, 0);
             }
 
             ctx.closePath();
@@ -519,8 +465,8 @@
             const tileWidth = CANVAS_SIZE / gridCols;
             const tileHeight = CANVAS_SIZE / gridRows;
 
-            const padX = tileWidth * 0.25;
-            const padY = tileHeight * 0.25;
+            const padX = tileWidth * 0.3;
+            const padY = tileHeight * 0.3;
 
             for (let r = 0; r < gridRows; r++) {
                 for (let c = 0; c < gridCols; c++) {
@@ -528,25 +474,31 @@
                     const edges = pieceEdges[r][c];
 
                     const pCanvas = document.createElement('canvas');
-                    pCanvas.width = tileWidth * 1.5;
-                    pCanvas.height = tileHeight * 1.5;
+                    const canvasW = tileWidth + padX * 2;
+                    const canvasH = tileHeight + padY * 2;
+                    pCanvas.width = canvasW;
+                    pCanvas.height = canvasH;
                     const pCtx = pCanvas.getContext('2d');
 
                     pCtx.save();
+                    pCtx.translate(padX, padY);
+                    
                     drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
                     pCtx.clip();
 
                     pCtx.drawImage(
                         fullImageCanvas,
-                        c * tileWidth - padX, r * tileHeight - padY, tileWidth * 1.5, tileHeight * 1.5,
-                        0, 0, tileWidth * 1.5, tileHeight * 1.5
+                        c * tileWidth - padX, r * tileHeight - padY, canvasW, canvasH,
+                        -padX, -padY, canvasW, canvasH
                     );
 
                     pCtx.restore();
 
+                    // Subtle black border line over jigsaw tab cut edges
                     pCtx.save();
+                    pCtx.translate(padX, padY);
                     drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
-                    pCtx.strokeStyle = 'rgba(0,0,0,0.25)';
+                    pCtx.strokeStyle = 'rgba(0,0,0,0.3)';
                     pCtx.lineWidth = 2;
                     pCtx.stroke();
                     pCtx.restore();
@@ -558,7 +510,9 @@
                         col: c,
                         canvas: pCanvas,
                         dataUrl: pCanvas.toDataURL(),
-                        edges: edges
+                        edges: edges,
+                        padX: padX,
+                        padY: padY
                     });
                 }
             }
@@ -572,11 +526,12 @@
         function renderGridSlots() {
             const gridEl = document.getElementById('puzzle-grid');
             gridEl.style.gridTemplateColumns = `repeat(${gridCols}, minmax(0, 1fr))`;
+            gridEl.style.gridTemplateRows = `repeat(${gridRows}, minmax(0, 1fr))`;
             gridEl.innerHTML = '';
 
             for (let i = 0; i < gridCols * gridRows; i++) {
                 const slot = document.createElement('div');
-                slot.className = 'puzzle-slot rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer';
+                slot.className = 'puzzle-slot rounded-2xl relative flex items-center justify-center cursor-pointer';
                 slot.dataset.slotIndex = i;
 
                 slot.addEventListener('click', () => handleSlotClick(i));
@@ -643,7 +598,7 @@
             const slotEl = document.querySelector(`[data-slot-index="${slotIndex}"]`);
             const piece = puzzlePieces.find(p => p.id === pieceId);
 
-            slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute -top-[25%] -left-[25%] w-[150%] h-[150%] max-w-none object-cover pointer-events-none">`;
+            slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute pointer-events-none max-w-none" style="width: 160%; height: 160%; top: -30%; left: -30%;">`;
             slotEl.classList.remove('puzzle-slot');
 
             const remainingLoose = puzzlePieces.filter(p => !boardState.includes(p.id));
@@ -662,7 +617,6 @@
             }
         }
 
-        // HINT BUTTON AUTO-HIDE LOGIC (1 SECOND TIMEOUT)
         function toggleHint() {
             const hintCanvas = document.getElementById('hint-canvas');
             
