@@ -213,6 +213,7 @@
                             <button onclick="changePieceCount(1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">+</button>
                         </div>
 
+                        <!-- Action Buttons including Back/Undo -->
                         <div class="flex items-center flex-wrap gap-2">
                             <button onclick="toggleHint()" id="btn-hint" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition-all flex items-center space-x-1.5">
                                 <span>💡 HINT</span>
@@ -220,6 +221,10 @@
                             
                             <button onclick="reCutPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-pink-500 text-white shadow-sm hover:bg-pink-600 transition-all flex items-center space-x-1.5">
                                 <span>✂ NEW CUT</span>
+                            </button>
+
+                            <button onclick="undoLastMove()" id="btn-undo" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-purple-500 text-white shadow-sm hover:bg-purple-600 transition-all flex items-center space-x-1.5">
+                                <span>◀ BACK</span>
                             </button>
 
                             <button onclick="resetPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-amber-400 text-slate-900 shadow-sm hover:bg-amber-500 transition-all flex items-center space-x-1.5">
@@ -294,6 +299,7 @@
         
         let puzzlePieces = [];
         let boardState = [];
+        let moveHistory = []; // Stack to track move history for Undo/Back button
         let selectedPieceId = null;
         let pieceEdges = [];
         let hintTimeout = null;
@@ -388,6 +394,7 @@
         function initGame() {
             const faceData = getCurrentFaceData();
             document.getElementById('face-name-badge').innerText = faceData.name;
+            moveHistory = [];
             
             const ctx = fullImageCanvas.getContext('2d');
             ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
@@ -460,6 +467,7 @@
         function createPuzzlePieces() {
             puzzlePieces = [];
             boardState = new Array(gridCols * gridRows).fill(null);
+            moveHistory = [];
             selectedPieceId = null;
 
             const tileWidth = CANVAS_SIZE / gridCols;
@@ -602,11 +610,11 @@
             if (boardState[slotIndex] !== null) return;
 
             boardState[slotIndex] = pieceId;
+            moveHistory.push({ pieceId, slotIndex });
 
             const slotEl = document.querySelector(`[data-slot-index="${slotIndex}"]`);
             const piece = puzzlePieces.find(p => p.id === pieceId);
 
-            // Exactly position canvas render on top of the slot with knob extension offsets (-30%)
             slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute pointer-events-none max-w-none z-20" style="width: 160%; height: 160%; top: -30%; left: -30%;">`;
             slotEl.classList.remove('puzzle-slot');
 
@@ -615,6 +623,22 @@
             selectedPieceId = null;
 
             checkWinState();
+        }
+
+        // UNDO / BACK BUTTON LOGIC
+        function undoLastMove() {
+            if (moveHistory.length === 0) return;
+
+            const lastMove = moveHistory.pop();
+            boardState[lastMove.slotIndex] = null;
+
+            const slotEl = document.querySelector(`[data-slot-index="${lastMove.slotIndex}"]`);
+            slotEl.innerHTML = '';
+            slotEl.className = 'puzzle-slot rounded-2xl absolute flex items-center justify-center cursor-pointer';
+
+            const remainingLoose = puzzlePieces.filter(p => !boardState.includes(p.id));
+            renderLoosePieces(remainingLoose);
+            selectedPieceId = null;
         }
 
         function checkWinState() {
@@ -643,6 +667,7 @@
 
         function resetPuzzle() {
             boardState = new Array(gridCols * gridRows).fill(null);
+            moveHistory = [];
             renderGridSlots();
             renderLoosePieces([...puzzlePieces].sort(() => Math.random() - 0.5));
             selectedPieceId = null;
