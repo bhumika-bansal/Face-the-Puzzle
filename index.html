@@ -1,357 +1,708 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Face the Puzzle - Noise Junior</title>
-  <style>
-    :root {
-      --bg-color: #FFF9E6;
-      --board-bg: #1EC260;
-      --text-dark: #1A1A1A;
-      --brand-blue: #4A90E2;
-      --brand-pink: #FF6B8B;
-      --brand-yellow: #FFB800;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    header {
-      width: 100%;
-      max-width: 1000px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .top-left-logo {
-      height: 48px;
-      width: auto;
-      display: block;
-    }
-
-    .tab-container {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .tab-btn {
-      padding: 10px 24px;
-      border-radius: 30px;
-      border: 2px solid #1A1A1A;
-      background: #FFFFFF;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--brand-yellow);
-      box-shadow: 0 4px 0 #1A1A1A;
-      transform: translateY(-2px);
-    }
-
-    .main-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .puzzle-board {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background-color: var(--board-bg);
-      border-radius: 24px;
-      padding: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 4px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .board-slot {
-      border: 2px dashed rgba(255, 255, 255, 0.4);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      background-size: 300% 200%;
-    }
-
-    .board-slot.filled {
-      border: none;
-    }
-
-    .loose-pieces-panel {
-      width: 100%;
-      background: #FFFFFF;
-      border: 2px solid #1A1A1A;
-      border-radius: 20px;
-      padding: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      min-height: 140px;
-    }
-
-    .puzzle-piece {
-      width: 90px;
-      height: 90px;
-      border-radius: 8px;
-      cursor: grab;
-      background-size: 300% 200%;
-      border: 2px solid rgba(0,0,0,0.1);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      transition: transform 0.15s ease;
-    }
-
-    .puzzle-piece:hover {
-      transform: scale(1.05);
-    }
-
-    .todays-face-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .todays-face-badge {
-      background: #FFFFFF;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 700;
-      border: 1px solid #1A1A1A;
-    }
-
-    .todays-face-name {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text-dark);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .modal-card {
-      background: #FFFFFF;
-      padding: 32px;
-      border-radius: 24px;
-      text-align: center;
-      border: 3px solid #1A1A1A;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-      max-width: 80%;
-    }
-
-    .modal-card h2 {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-
-    .modal-btn {
-      margin-top: 20px;
-      padding: 12px 28px;
-      background: var(--brand-blue);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <img src="logo.png" alt="Noise Junior" class="top-left-logo" />
-    <div class="todays-face-badge">Today's Face</div>
-  </header>
-
-  <div class="tab-container">
-    <button class="tab-btn active" id="tab-champ">Champ 3 🏆</button>
-    <button class="tab-btn" id="tab-explorer">Explorer 2</button>
-  </div>
-
-  <div class="main-container">
-    <div class="puzzle-board" id="board">
-      <div class="board-slot" data-index="0"></div>
-      <div class="board-slot" data-index="1"></div>
-      <div class="board-slot" data-index="2"></div>
-      <div class="board-slot" data-index="3"></div>
-      <div class="board-slot" data-index="4"></div>
-      <div class="board-slot" data-index="5"></div>
-    </div>
-
-    <div class="loose-pieces-panel" id="pieces-panel"></div>
-
-    <div class="todays-face-container">
-      <div class="todays-face-name" id="face-name">Active Runner</div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="win-modal">
-    <div class="modal-card">
-      <h2>Well Done! 🎉</h2>
-      <p>You are Noise Junior Certified 👀💛</p>
-      <button class="modal-btn" onclick="nextPuzzle()">Play Next Face</button>
-    </div>
-  </div>
-
-  <script>
-    const watchData = {
-      champ: [
-        { name: "Active Runner", img: "Frame 2147226976.png" },
-        { name: "Monkey Bar Boy", img: "Frame 2147226978.png" },
-        { name: "High Five Hands", img: "Packaging watchface.png" },
-        { name: "Lego Bricks", img: "Lego (1).png" }
-      ],
-      explorer: [
-        { name: "Active Runner", img: "Frame 2147226976.png" },
-        { name: "Window Cat", img: "Gemini_Generated_Image_1ppnm1ppnm1ppnm1.jpeg" },
-        { name: "Sneaker Step", img: "Gemini_Generated_Image_1ppnm1ppnm1ppnm1 (1).jpeg" },
-        { name: "Lazy Capybara", img: "Capybara.png" }
-      ]
-    };
-
-    let currentTab = 'champ';
-    let currentPuzzleIndex = 0;
-    let placedCount = 0;
-
-    const boardSlots = document.querySelectorAll('.board-slot');
-    const piecesPanel = document.getElementById('pieces-panel');
-    const faceNameEl = document.getElementById('face-name');
-    const modal = document.getElementById('win-modal');
-
-    function loadPuzzle() {
-      placedCount = 0;
-      modal.style.display = 'none';
-      const activeItem = watchData[currentTab][currentPuzzleIndex];
-      faceNameEl.textContent = activeItem.name;
-
-      boardSlots.forEach((slot) => {
-        slot.innerHTML = '';
-        slot.classList.remove('filled');
-        slot.style.backgroundImage = 'none';
-      });
-
-      piecesPanel.innerHTML = '';
-      
-      let pieces = [];
-      for (let row = 0; row < 2; row++) {
-        for (let col = 0; col < 3; col++) {
-          const index = row * 3 + col;
-          pieces.push({ index, row, col });
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face the Puzzle - Noise Junior</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['"Fira Sans Condensed"', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brandYellow: '#FFF4A3',
+                        brandGreen: '#12B981',
+                        brandBoardGreen: '#23C45E',
+                        brandRed: '#EF4444',
+                        brandPurple: '#8B5CF6',
+                        brandPink: '#EC4899',
+                        brandDark: '#111827',
+                    }
+                }
+            }
         }
-      }
+    </script>
+    <style>
+        body {
+            background-color: #FFF9D2;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
 
-      pieces.sort(() => Math.random() - 0.5);
+        .font-fira {
+            font-family: 'Fira Sans Condensed', sans-serif;
+        }
 
-      pieces.forEach(p => {
-        const piece = document.createElement('div');
-        piece.className = 'puzzle-piece';
-        piece.draggable = true;
-        piece.dataset.index = p.index;
+        /* Top Left Header Logo clean transparent override */
+        .top-left-header, 
+        .header-logo {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .sticker-badge {
+            display: inline-block;
+            transform: rotate(-2deg);
+            box-shadow: 2px 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+        }
+        .sticker-badge:hover {
+            transform: rotate(0deg) scale(1.04);
+        }
+
+        .puzzle-slot {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1.5px dashed rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+        }
+        .puzzle-slot.highlight {
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 2px solid #ffffff;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .piece-item {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+        .piece-item:active {
+            cursor: grabbing;
+            transform: scale(1.08);
+            z-index: 50;
+        }
+        .piece-item.selected {
+            filter: drop-shadow(0 0 8px #EF4444);
+            transform: scale(1.05);
+            z-index: 40;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between relative selection:bg-yellow-200">
+
+    <header class="w-full bg-white border-b border-yellow-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between relative z-20 shadow-sm">
+        <!-- Top Left Clean PNG Logo -->
+        <div class="flex items-center top-left-header">
+            <img src="logo.png" alt="Noise Junior" class="h-9 sm:h-11 w-auto object-contain block bg-transparent" />
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1.5 rounded-full border border-slate-200">
+            <button id="tab-champ" onclick="switchTab('champ')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm">
+                <span>CHAMP 3</span>
+            </button>
+            <button id="tab-explorer" onclick="switchTab('explorer')" class="px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900">
+                <span>EXPLORER 2</span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex-grow relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT PANEL: Instructions & Today's Face Card -->
+            <div class="lg:col-span-4 flex flex-col justify-between space-y-8">
+                
+                <div>
+                    <h1 class="font-fira font-black text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-none tracking-tight">
+                        Face the<br/>
+                        Puz<span class="text-amber-400 inline-block transform hover:rotate-45 transition-transform cursor-pointer">✱</span>le
+                    </h1>
+                    <p class="text-slate-600 mt-3 text-sm sm:text-base font-medium">
+                        You've seen the watch faces.<br/>
+                        Now let's see if you remember them.
+                    </p>
+                </div>
+
+                <!-- How To Play Steps -->
+                <div class="space-y-4">
+                    <h3 class="font-fira font-extrabold text-xs uppercase tracking-widest text-slate-400">HOW TO PLAY</h3>
+                    
+                    <div class="space-y-3 font-medium text-xs sm:text-sm text-slate-700">
+                        <div class="flex items-start space-x-3">
+                            <span class="bg-amber-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">01</span>
+                            <span>Pick a piece from the panel below. Find its happy little home on the green board.</span>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="bg-pink-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">02</span>
+                            <span>Feeling stuck? Peek at the watch face with a quick hint!</span>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="bg-emerald-300 text-slate-900 font-fira font-black text-xs px-2.5 py-1 rounded-full shadow-sm flex-shrink-0">03</span>
+                            <span>Piece by piece, bring the whole face to life. 💛</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Face Card -->
+                <div class="bg-white rounded-3xl p-5 sm:p-6 border-2 border-amber-200/60 shadow-xl shadow-amber-900/5 relative overflow-hidden group">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="bg-amber-100 text-amber-900 font-fira font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider">
+                            TODAY'S FACE
+                        </span>
+                        <span id="watch-series-tag" class="text-xs font-bold text-slate-400 font-fira uppercase tracking-wider">
+                            CHAMP 3 SERIES
+                        </span>
+                    </div>
+
+                    <div class="flex items-center space-x-4 my-2">
+                        <div class="flex-1">
+                            <div class="sticker-badge bg-emerald-400 text-slate-900 font-fira font-black text-lg sm:text-2xl px-4 py-2 rounded-xl uppercase tracking-wide border-2 border-slate-900 shadow-sm" id="face-name-badge">
+                                ACTIVE RUNNER
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium mt-3" id="face-description">
+                                Official custom watch face design.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: Puzzle Grid & Controls -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <div class="bg-white rounded-3xl p-4 sm:p-6 border-2 border-amber-200/80 shadow-xl shadow-amber-900/5">
+                    
+                    <!-- Board Top Header -->
+                    <div class="flex items-center justify-between mb-4 px-2">
+                        <span class="font-fira font-black text-xs sm:text-sm uppercase tracking-widest text-slate-500">YOUR PUZZLE BOARD</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold font-fira text-slate-400">PIECES:</span>
+                            <span id="piece-count-label" class="font-fira font-black text-sm text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">12</span>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full aspect-square max-w-[500px] mx-auto bg-brandBoardGreen rounded-3xl p-3 sm:p-4 shadow-inner border-4 border-emerald-600/30 overflow-hidden" id="puzzle-container">
+                        
+                        <!-- Ghost Canvas for Hint -->
+                        <canvas id="hint-canvas" class="absolute inset-0 w-full h-full p-3 sm:p-4 opacity-0 transition-opacity duration-300 pointer-events-none rounded-3xl"></canvas>
+
+                        <!-- Interactive Grid Container -->
+                        <div id="puzzle-grid" class="w-full h-full grid gap-1 relative z-10">
+                            <!-- Slots created via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Loose Pieces Panel Section -->
+                    <div class="mt-6 pt-5 border-t border-slate-100">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <span class="font-fira font-black text-xs uppercase tracking-widest text-slate-400">LOOSE PIECES</span>
+                            <span class="text-xs text-slate-400 font-medium hidden sm:inline-block">Tap piece, then tap matching grid spot or drag directly</span>
+                        </div>
+
+                        <!-- Scrollable Pieces Box -->
+                        <div id="loose-pieces-container" class="min-h-[120px] bg-slate-50 rounded-2xl p-3 border-2 border-dashed border-slate-200 flex items-center space-x-4 overflow-x-auto no-scrollbar">
+                            <!-- Loose pieces populated via JS -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2">
+                        
+                        <!-- Piece Count Selector -->
+                        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button onclick="changePieceCount(-1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">-</button>
+                            <span id="grid-size-text" class="font-fira font-bold text-xs sm:text-sm px-2 text-slate-800">12 pcs</span>
+                            <button onclick="changePieceCount(1)" class="w-8 h-8 rounded-lg bg-white font-black text-slate-700 hover:bg-slate-200 shadow-sm flex items-center justify-center transition-colors">+</button>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center flex-wrap gap-2">
+                            <button onclick="toggleHint()" id="btn-hint" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 transition-all flex items-center space-x-1.5">
+                                <span>💡 HINT</span>
+                            </button>
+                            
+                            <button onclick="reCutPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-pink-500 text-white shadow-sm hover:bg-pink-600 transition-all flex items-center space-x-1.5">
+                                <span>✂ NEW CUT</span>
+                            </button>
+
+                            <button onclick="resetPuzzle()" class="px-3.5 py-2 rounded-xl font-fira font-extrabold text-xs sm:text-sm bg-amber-400 text-slate-900 shadow-sm hover:bg-amber-500 transition-all flex items-center space-x-1.5">
+                                <span>↺ RESET</span>
+                            </button>
+
+                            <button onclick="tryAnotherFace()" class="px-4 py-2 rounded-xl font-fira font-black text-xs sm:text-sm bg-slate-900 text-white shadow-md hover:bg-slate-800 transition-all flex items-center space-x-1.5">
+                                <span>🔄 TRY ANOTHER</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <div id="win-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center border-4 border-amber-300 shadow-2xl transform scale-95 transition-transform duration-300 relative overflow-hidden" id="win-modal-card">
+            
+            <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner border-2 border-amber-300 animate-bounce">
+                🏆
+            </div>
+
+            <span class="bg-emerald-100 text-emerald-800 font-fira font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
+                PUZZLE COMPLETED!
+            </span>
+
+            <h2 class="font-fira font-black text-2xl sm:text-3xl text-slate-900 leading-tight mb-2">
+                Well Done!<br/>
+                <span class="text-amber-500">You are Noise Junior Certified 👀💛</span>
+            </h2>
+
+            <p class="text-slate-600 text-sm font-medium mb-6">
+                Awesome memory! You brought the entire watch face to life flawlessly.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button onclick="tryAnotherFace(); closeWinModal();" class="w-full sm:w-auto px-6 py-3 rounded-2xl font-fira font-black text-sm bg-emerald-500 text-white shadow-lg hover:bg-emerald-600 transition-all">
+                    NEXT WATCH FACE ➔
+                </button>
+                <button onclick="closeWinModal()" class="w-full sm:w-auto px-5 py-3 rounded-2xl font-fira font-bold text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all">
+                    VIEW BOARD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WATCH FACE DATA POOL (IMAGE BASED + FALLBACK DRAW PROCEDURES)
+        const WATCH_FACES = {
+            champ: [
+                { id: 'c1', name: 'ACTIVE RUNNER', img: 'Frame 2147226976.png' },
+                { id: 'c2', name: 'ROPE CLIMBER', img: 'Frame 2147226978.png' },
+                { id: 'c3', name: 'HIGH FIVE HANDS', img: 'Packaging watchface.png' },
+                { id: 'c4', name: 'LEGO BRICKS GRID', img: 'Lego (1).png' }
+            ],
+            explorer: [
+                { id: 'e1', name: 'WINDOW CAT AT NIGHT', img: 'Gemini_Generated_Image_1ppnm1ppnm1ppnm1.jpeg' },
+                { id: 'e2', name: 'SNEAKER STEP COUNTER', img: 'Gemini_Generated_Image_1ppnm1ppnm1ppnm1 (1).jpeg' },
+                { id: 'e3', name: 'LAZY CAPYBARA', img: 'Capybara.png' },
+                { id: 'e4', name: 'ACTIVE RUNNER', img: 'Frame 2147226976.png' }
+            ]
+        };
+
+        // GAME STATE
+        let currentTab = 'champ';
+        let currentFaceIndex = 0;
+        let gridCols = 4;
+        let gridRows = 3;
+        let activePieceCount = 12;
         
-        piece.style.backgroundImage = `url('${activeItem.img}')`;
-        piece.style.backgroundPosition = `${p.col * 50}% ${p.row * 100}%`;
+        let puzzlePieces = [];
+        let boardState = [];
+        let selectedPieceId = null;
+        let isHintVisible = false;
+        let pieceEdges = [];
 
-        piece.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', p.index);
+        let fullImageCanvas = document.createElement('canvas');
+        const CANVAS_SIZE = 600;
+        fullImageCanvas.width = CANVAS_SIZE;
+        fullImageCanvas.height = CANVAS_SIZE;
+
+        // JIGSAW INTERLOCKING CUT PATH GENERATOR
+        function drawJigsawPath(ctx, width, height, top, right, bottom, left) {
+            const padX = width * 0.25;
+            const padY = height * 0.25;
+            
+            ctx.beginPath();
+            ctx.moveTo(padX, padY);
+
+            // TOP EDGE
+            if (top === 0) {
+                ctx.lineTo(padX + width, padY);
+            } else {
+                const dir = top;
+                ctx.lineTo(padX + width * 0.35, padY);
+                ctx.bezierCurveTo(
+                    padX + width * 0.35, padY - dir * height * 0.18,
+                    padX + width * 0.45, padY - dir * height * 0.22,
+                    padX + width * 0.5, padY - dir * height * 0.22
+                );
+                ctx.bezierCurveTo(
+                    padX + width * 0.55, padY - dir * height * 0.22,
+                    padX + width * 0.65, padY - dir * height * 0.18,
+                    padX + width * 0.65, padY
+                );
+                ctx.lineTo(padX + width, padY);
+            }
+
+            // RIGHT EDGE
+            if (right === 0) {
+                ctx.lineTo(padX + width, padY + height);
+            } else {
+                const dir = right;
+                ctx.lineTo(padX + width, padY + height * 0.35);
+                ctx.bezierCurveTo(
+                    padX + width + dir * width * 0.18, padY + height * 0.35,
+                    padX + width + dir * width * 0.22, padY + height * 0.45,
+                    padX + width + dir * width * 0.22, padY + height * 0.5
+                );
+                ctx.bezierCurveTo(
+                    padX + width + dir * width * 0.22, padY + height * 0.55,
+                    padX + width + dir * width * 0.18, padY + height * 0.65,
+                    padX + width, padY + height * 0.65
+                );
+                ctx.lineTo(padX + width, padY + height);
+            }
+
+            // BOTTOM EDGE
+            if (bottom === 0) {
+                ctx.lineTo(padX, padY + height);
+            } else {
+                const dir = bottom;
+                ctx.lineTo(padX + width * 0.65, padY + height);
+                ctx.bezierCurveTo(
+                    padX + width * 0.65, padY + height + dir * height * 0.18,
+                    padX + width * 0.55, padY + height + dir * height * 0.22,
+                    padX + width * 0.5, padY + height + dir * height * 0.22
+                );
+                ctx.bezierCurveTo(
+                    padX + width * 0.45, padY + height + dir * height * 0.22,
+                    padX + width * 0.35, padY + height + dir * height * 0.18,
+                    padX + width * 0.35, padY + height
+                );
+                ctx.lineTo(padX, padY + height);
+            }
+
+            // LEFT EDGE
+            if (left === 0) {
+                ctx.lineTo(padX, padY);
+            } else {
+                const dir = left;
+                ctx.lineTo(padX, padY + height * 0.65);
+                ctx.bezierCurveTo(
+                    padX - dir * width * 0.18, padY + height * 0.65,
+                    padX - dir * width * 0.22, padY + height * 0.55,
+                    padX - dir * width * 0.22, padY + height * 0.5
+                );
+                ctx.bezierCurveTo(
+                    padX - dir * width * 0.22, padY + height * 0.45,
+                    padX - dir * width * 0.18, padY + height * 0.35,
+                    padX, padY + height * 0.35
+                );
+                ctx.lineTo(padX, padY);
+            }
+
+            ctx.closePath();
+        }
+
+        window.addEventListener('load', () => {
+            initGame();
         });
 
-        piecesPanel.appendChild(piece);
-      });
-    }
+        function switchTab(tabName) {
+            if (currentTab === tabName) return;
+            currentTab = tabName;
+            currentFaceIndex = 0;
 
-    boardSlots.forEach(slot => {
-      slot.addEventListener('dragover', (e) => e.preventDefault());
-      
-      slot.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const draggedIndex = e.dataTransfer.getData('text/plain');
-        const slotIndex = slot.dataset.index;
+            const btnChamp = document.getElementById('tab-champ');
+            const btnExplorer = document.getElementById('tab-explorer');
 
-        if (draggedIndex === slotIndex && !slot.classList.contains('filled')) {
-          slot.classList.add('filled');
-          
-          const activeItem = watchData[currentTab][currentPuzzleIndex];
-          const col = slotIndex % 3;
-          const row = Math.floor(slotIndex / 3);
-          
-          slot.style.backgroundImage = `url('${activeItem.img}')`;
-          slot.style.backgroundPosition = `${col * 50}% ${row * 100}%`;
+            if (tabName === 'champ') {
+                btnChamp.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm";
+                btnExplorer.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900";
+                document.getElementById('watch-series-tag').innerText = 'CHAMP 3 SERIES';
+            } else {
+                btnExplorer.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center bg-slate-900 text-white shadow-sm";
+                btnChamp.className = "px-4 sm:px-6 py-2 rounded-full font-fira font-extrabold text-sm sm:text-base tracking-wider transition-all duration-200 flex items-center text-slate-700 hover:text-slate-900";
+                document.getElementById('watch-series-tag').innerText = 'EXPLORER 2 SERIES';
+            }
 
-          const pieceEl = piecesPanel.querySelector(`[data-index="${draggedIndex}"]`);
-          if (pieceEl) pieceEl.remove();
-
-          placedCount++;
-          if (placedCount === 6) {
-            setTimeout(() => {
-              modal.style.display = 'flex';
-            }, 300);
-          }
+            initGame();
         }
-      });
-    });
 
-    document.getElementById('tab-champ').addEventListener('click', (e) => {
-      currentTab = 'champ';
-      currentPuzzleIndex = 0;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      loadPuzzle();
-    });
+        function getCurrentFaceData() {
+            return WATCH_FACES[currentTab][currentFaceIndex];
+        }
 
-    document.getElementById('tab-explorer').addEventListener('click', (e) => {
-      currentTab = 'explorer';
-      currentPuzzleIndex = 0;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      loadPuzzle();
-    });
+        function tryAnotherFace() {
+            const pool = WATCH_FACES[currentTab];
+            currentFaceIndex = (currentFaceIndex + 1) % pool.length;
+            initGame();
+        }
 
-    function nextPuzzle() {
-      currentPuzzleIndex = (currentPuzzleIndex + 1) % watchData[currentTab].length;
-      loadPuzzle();
-    }
+        function initGame() {
+            const faceData = getCurrentFaceData();
+            document.getElementById('face-name-badge').innerText = faceData.name;
+            
+            const ctx = fullImageCanvas.getContext('2d');
+            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    loadPuzzle();
-  </script>
+            const img = new Image();
+            img.src = faceData.img;
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                finishInit();
+            };
+            img.onerror = () => {
+                // Background fallback
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '900 60px "Fira Sans Condensed", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(faceData.name, CANVAS_SIZE/2, CANVAS_SIZE/2);
+                finishInit();
+            };
+        }
+
+        function finishInit() {
+            const hintCanvas = document.getElementById('hint-canvas');
+            hintCanvas.width = CANVAS_SIZE;
+            hintCanvas.height = CANVAS_SIZE;
+            const hintCtx = hintCanvas.getContext('2d');
+            hintCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            hintCtx.drawImage(fullImageCanvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+            generateEdgeMap();
+            createPuzzlePieces();
+        }
+
+        function generateEdgeMap() {
+            pieceEdges = [];
+            for (let r = 0; r < gridRows; r++) {
+                pieceEdges[r] = [];
+                for (let c = 0; c < gridCols; c++) {
+                    pieceEdges[r][c] = {
+                        top: r === 0 ? 0 : -pieceEdges[r-1][c].bottom,
+                        right: c === gridCols - 1 ? 0 : (Math.random() < 0.5 ? 1 : -1),
+                        bottom: r === gridRows - 1 ? 0 : (Math.random() < 0.5 ? 1 : -1),
+                        left: c === 0 ? 0 : -pieceEdges[r][c-1].right
+                    };
+                }
+            }
+        }
+
+        function changePieceCount(delta) {
+            if (delta > 0 && activePieceCount < 16) {
+                if (activePieceCount === 6) setGridDimensions(3, 3, 9);
+                else if (activePieceCount === 9) setGridDimensions(4, 3, 12);
+                else if (activePieceCount === 12) setGridDimensions(4, 4, 16);
+            } else if (delta < 0 && activePieceCount > 6) {
+                if (activePieceCount === 16) setGridDimensions(4, 3, 12);
+                else if (activePieceCount === 12) setGridDimensions(3, 3, 9);
+                else if (activePieceCount === 9) setGridDimensions(3, 2, 6);
+            }
+        }
+
+        function setGridDimensions(cols, rows, count) {
+            gridCols = cols;
+            gridRows = rows;
+            activePieceCount = count;
+            document.getElementById('piece-count-label').innerText = count;
+            document.getElementById('grid-size-text').innerText = `${count} pcs`;
+            initGame();
+        }
+
+        function createPuzzlePieces() {
+            puzzlePieces = [];
+            boardState = new Array(gridCols * gridRows).fill(null);
+            selectedPieceId = null;
+
+            const tileWidth = CANVAS_SIZE / gridCols;
+            const tileHeight = CANVAS_SIZE / gridRows;
+
+            const padX = tileWidth * 0.25;
+            const padY = tileHeight * 0.25;
+
+            for (let r = 0; r < gridRows; r++) {
+                for (let c = 0; c < gridCols; c++) {
+                    const index = r * gridCols + c;
+                    const edges = pieceEdges[r][c];
+
+                    const pCanvas = document.createElement('canvas');
+                    pCanvas.width = tileWidth * 1.5;
+                    pCanvas.height = tileHeight * 1.5;
+                    const pCtx = pCanvas.getContext('2d');
+
+                    pCtx.save();
+                    drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
+                    pCtx.clip();
+
+                    pCtx.drawImage(
+                        fullImageCanvas,
+                        c * tileWidth - padX, r * tileHeight - padY, tileWidth * 1.5, tileHeight * 1.5,
+                        0, 0, tileWidth * 1.5, tileHeight * 1.5
+                    );
+
+                    pCtx.restore();
+
+                    // Subtle border outline on jigsaw cut
+                    pCtx.save();
+                    drawJigsawPath(pCtx, tileWidth, tileHeight, edges.top, edges.right, edges.bottom, edges.left);
+                    pCtx.strokeStyle = 'rgba(0,0,0,0.25)';
+                    pCtx.lineWidth = 2;
+                    pCtx.stroke();
+                    pCtx.restore();
+
+                    puzzlePieces.push({
+                        id: index,
+                        correctSlot: index,
+                        row: r,
+                        col: c,
+                        canvas: pCanvas,
+                        dataUrl: pCanvas.toDataURL(),
+                        edges: edges
+                    });
+                }
+            }
+
+            let loosePieces = [...puzzlePieces].sort(() => Math.random() - 0.5);
+
+            renderGridSlots();
+            renderLoosePieces(loosePieces);
+        }
+
+        function renderGridSlots() {
+            const gridEl = document.getElementById('puzzle-grid');
+            gridEl.style.gridTemplateColumns = `repeat(${gridCols}, minmax(0, 1fr))`;
+            gridEl.innerHTML = '';
+
+            for (let i = 0; i < gridCols * gridRows; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'puzzle-slot rounded-2xl relative flex items-center justify-center overflow-hidden cursor-pointer';
+                slot.dataset.slotIndex = i;
+
+                slot.addEventListener('click', () => handleSlotClick(i));
+                slot.addEventListener('dragover', (e) => e.preventDefault());
+                slot.addEventListener('drop', (e) => handleDrop(e, i));
+
+                gridEl.appendChild(slot);
+            }
+        }
+
+        function renderLoosePieces(pieces) {
+            const container = document.getElementById('loose-pieces-container');
+            container.innerHTML = '';
+
+            if (pieces.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 font-fira font-bold uppercase mx-auto">All pieces placed on board!</span>`;
+                return;
+            }
+
+            pieces.forEach(p => {
+                const img = document.createElement('img');
+                img.src = p.dataUrl;
+                img.className = 'piece-item w-20 h-20 sm:w-24 sm:h-24 object-contain flex-shrink-0 cursor-grab active:cursor-grabbing';
+                img.dataset.pieceId = p.id;
+                img.draggable = true;
+
+                img.addEventListener('click', () => selectPiece(p.id, img));
+                img.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', p.id);
+                });
+
+                container.appendChild(img);
+            });
+        }
+
+        function selectPiece(id, imgEl) {
+            document.querySelectorAll('.piece-item').forEach(el => el.classList.remove('selected'));
+            if (selectedPieceId === id) {
+                selectedPieceId = null;
+            } else {
+                selectedPieceId = id;
+                imgEl.classList.add('selected');
+            }
+        }
+
+        function handleSlotClick(slotIndex) {
+            if (selectedPieceId === null) return;
+            placePiece(selectedPieceId, slotIndex);
+        }
+
+        function handleDrop(e, slotIndex) {
+            e.preventDefault();
+            const pieceId = parseInt(e.dataTransfer.getData('text/plain'));
+            if (!isNaN(pieceId)) {
+                placePiece(pieceId, slotIndex);
+            }
+        }
+
+        function placePiece(pieceId, slotIndex) {
+            if (boardState[slotIndex] !== null) return;
+
+            boardState[slotIndex] = pieceId;
+
+            const slotEl = document.querySelector(`[data-slot-index="${slotIndex}"]`);
+            const piece = puzzlePieces.find(p => p.id === pieceId);
+
+            // Render fitted piece image accurately scaled up so the jigsaw cuts overlap smoothly
+            slotEl.innerHTML = `<img src="${piece.dataUrl}" class="absolute -top-[25%] -left-[25%] w-[150%] h-[150%] max-w-none object-cover pointer-events-none">`;
+            slotEl.classList.remove('puzzle-slot');
+
+            const remainingLoose = puzzlePieces.filter(p => !boardState.includes(p.id));
+            renderLoosePieces(remainingLoose);
+            selectedPieceId = null;
+
+            checkWinState();
+        }
+
+        function checkWinState() {
+            const isComplete = boardState.every((pieceId, idx) => pieceId === idx);
+            if (isComplete) {
+                setTimeout(() => {
+                    triggerWinCelebration();
+                }, 300);
+            }
+        }
+
+        function toggleHint() {
+            const hintCanvas = document.getElementById('hint-canvas');
+            isHintVisible = !isHintVisible;
+            hintCanvas.style.opacity = isHintVisible ? '0.35' : '0';
+        }
+
+        function resetPuzzle() {
+            boardState = new Array(gridCols * gridRows).fill(null);
+            renderGridSlots();
+            renderLoosePieces([...puzzlePieces].sort(() => Math.random() - 0.5));
+            selectedPieceId = null;
+        }
+
+        function reCutPuzzle() {
+            initGame();
+        }
+
+        function triggerWinCelebration() {
+            confetti({
+                particleCount: 110,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+
+            const modal = document.getElementById('win-modal');
+            const card = document.getElementById('win-modal-card');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+        }
+
+        function closeWinModal() {
+            const modal = document.getElementById('win-modal');
+            const card = document.getElementById('win-modal-card');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+    </script>
 </body>
 </html>
